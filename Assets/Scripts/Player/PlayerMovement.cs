@@ -90,6 +90,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        velocity.x = controller.velocity.x;
+
         // Check if the player is grounded
         isGrounded = controller.isGrounded;
 
@@ -107,7 +109,8 @@ public class PlayerMovement : MonoBehaviour
         anim.SetBool(AnimStrings.isGrounded, isGrounded);
 
         Vector3 moveDirection = transform.right * movement;
-        controller.Move(moveSpeed * Time.deltaTime * moveDirection);
+        if(CanMove)
+            controller.Move(moveSpeed * Time.deltaTime * moveDirection);
 
         // Apply gravity
         controller.Move(velocity * Time.deltaTime);
@@ -115,10 +118,14 @@ public class PlayerMovement : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        movement = context.ReadValue<Vector2>();
-        IsMoving = movement != Vector2.zero;
+        if (CanMove)
+        {
+            movement = context.ReadValue<Vector2>();
+            IsMoving = movement != Vector2.zero;
 
-        SetFacingDirection(movement);
+            SetFacingDirection(movement);
+        }
+
     }
     private void SetFacingDirection(Vector2 moveInput)
     {
@@ -134,7 +141,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && CanMove)
         {
             if (isGrounded)
             {

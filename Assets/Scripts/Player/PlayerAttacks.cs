@@ -1,23 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 using UnityEngine;
 
 public class PlayerAttacks : MonoBehaviour
 {
-    // Start is called before the first frame update
+    Animator anim;
+    CharacterController controller;
+
+    private void Awake()
+    {
+        anim = GetComponent<Animator>();
+        controller = GetComponent<CharacterController>();
+    }
+
     void Start()
     {
         
     }
 
-    // Update is called once per frame
     void Update()
     {
         
     }
 
-    //public void BasicAttack()
-    //{
-        
-    //}
+    public void OnFire(InputAction.CallbackContext context)
+    {
+        if (context.started && controller.isGrounded)
+        {
+            anim.SetTrigger(AnimStrings.atkTrig);
+        }
+    }
 }
