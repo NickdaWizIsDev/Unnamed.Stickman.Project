@@ -118,13 +118,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1579812833141086583}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0.50000006, y: -0.49999997, z: -0.5, w: -0.5}
+  m_LocalPosition: {x: 0.04997147, y: -0.020955602, z: -1.7928674}
+  m_LocalScale: {x: 1.6119827, y: 1.6119827, z: 1.6119827}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2996688828356066593}
-  m_RootOrder: 2
+  m_Father: {fileID: 3341585355051901543}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &8600103230413511654
 BoxCollider:
@@ -134,7 +134,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1579812833141086583}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 2.25, z: 1}
@@ -278,6 +278,8 @@ GameObject:
   - component: {fileID: 3322770189076103943}
   - component: {fileID: 105749564975458774}
   - component: {fileID: 44295014708841157}
+  - component: {fileID: 4835544227212696067}
+  - component: {fileID: 3677840713509377010}
   m_Layer: 7
   m_Name: Zombie
   m_TagString: Enemy
@@ -299,7 +301,6 @@ Transform:
   m_Children:
   - {fileID: 3341585355051901543}
   - {fileID: 7874171394558113071}
-  - {fileID: 5087517263655546148}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -338,7 +339,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 8
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!65 &44295014708841157
 BoxCollider:
@@ -353,6 +354,49 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.4, y: 2, z: 1}
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &4835544227212696067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2512357887988934555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 860b496f4a488f34c93021a2e4a01c02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRange: 5
+  moveSpeed: 2
+  minDistance: 0.1
+  foundPlayer: 0
+  playerTransform: {fileID: 0}
+  player: {fileID: 0}
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 8
+--- !u!114 &3677840713509377010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2512357887988934555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d21b99bc79273441bc750d6e10a57bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mixer: {fileID: 0}
+  maxHealth: 10
+  health: 10
+  isAlive: 1
+  audioSource: {fileID: 0}
+  deathAudioSource: {fileID: 0}
+  dmgClip: {fileID: 0}
+  deathClip: {fileID: 0}
+  isInvincible: 0
+  iFrames: 0.5
 --- !u!1 &2532269956273506198
 GameObject:
   m_ObjectHideFlags: 0
@@ -441,7 +485,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4644093428841947763}
   m_LocalRotation: {x: 0.50000006, y: 0.49999997, z: 0.5, w: -0.5}
-  m_LocalPosition: {x: 0.013000011, y: 0.74, z: -0.031000018}
+  m_LocalPosition: {x: 0.01300001, y: 0.74, z: -0.03100002}
   m_LocalScale: {x: 0.620354, y: 0.620354, z: 0.620354}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -540,7 +584,8 @@ Transform:
   m_LocalPosition: {x: 0.013000011, y: 1.1122125, z: -0.031000005}
   m_LocalScale: {x: 0.62035406, y: 0.62035406, z: 0.62035406}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5087517263655546148}
   m_Father: {fileID: 2996688828356066593}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
