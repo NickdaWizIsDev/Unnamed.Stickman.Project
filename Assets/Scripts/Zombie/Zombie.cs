@@ -6,9 +6,14 @@ public class Zombie : MonoBehaviour
 {
     public float detectionRange;
     public float moveSpeed = 2.0f; // Adjust this to control the speed.
-    public float minDistance = 0.1f; // Adjust this to control how close they need to be.
+    public float minDistance = 0.5f; // Adjust this to control how close they need to be.
+    public float knockbackForce;
+
+    public float attackTimer = 0f;
 
     public bool foundPlayer = false;
+
+    public bool ready = false;
 
     public Transform playerTransform;
     public GameObject player;
@@ -31,12 +36,26 @@ public class Zombie : MonoBehaviour
     {
         DetectPlayer();
 
-        animator.SetBool(AnimStrings.foundPlayer, foundPlayer);        
+        animator.SetBool(AnimStrings.foundPlayer, foundPlayer);
+
+        if (damageable.IsHit)
+        {
+            Knockback();
+        }
+        if(!ready)
+        {
+            attackTimer += Time.deltaTime;
+        }
+        
+        if(attackTimer >= 2f)
+        {
+            ready = true;
+        }
     }
 
     private void FixedUpdate()
     {
-        if (foundPlayer)
+        if (foundPlayer && !damageable.IsHit)
         {
             Move();
         }
@@ -56,7 +75,7 @@ public class Zombie : MonoBehaviour
             {
                 // Player detected within the sphere.
                 // Implement your logic here.
-                Debug.Log("Found player!");
+                Debug.Log(gameObject.name + "Found player!");
                 foundPlayer = true;
             }
         }
@@ -68,40 +87,48 @@ public class Zombie : MonoBehaviour
 
         if (isMoving)
         {
-            // Calculate the direction to the player on the x-axis.
-            float directionX = playerTransform.position.x > transform.position.x ? 1.0f : -1.0f;
+            // Calculate the direction to the player.
+            Vector3 directionToPlayer = playerTransform.position - transform.position;
+
+            // Normalize the direction vector to get a unit vector.
+            directionToPlayer.Normalize();
 
             // Calculate the velocity to move towards the player.
-            Vector3 moveVelocity = new Vector3(directionX * moveSpeed, rb.velocity.y, 0.0f);
+            Vector3 moveVelocity = new(directionToPlayer.x * moveSpeed, rb.velocity.y, directionToPlayer.z * moveSpeed);
 
             // Apply the velocity to the Rigidbody.
             rb.velocity = moveVelocity;
 
-            Quaternion targetRotation;
-            if (directionX > 0)
-            {
-                // Rotate 180 degrees around the y-axis (up).
-                targetRotation = Quaternion.Euler(0.0f, 180.0f, 0.0f);
-            }
-            else
-            {
-                // Rotate back to 0 degrees.
-                targetRotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
-            }
-
             // Smoothly interpolate the rotation.
             float rotationSpeed = 5.0f; // Adjust this to control the rotation speed.
+            Quaternion targetRotation = Quaternion.Euler(0, Quaternion.LookRotation(directionToPlayer).eulerAngles.y + 90f, 0);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
-            // Check if the distance on the x-axis between the Zombie and player is very close.
-            if (Mathf.Abs(playerTransform.position.x - transform.position.x) < minDistance)
+            // Check if the distance between the Zombie and player is very close.
+            if (Vector3.Distance(transform.position, playerTransform.position) < minDistance)
             {
+                rb.velocity = Vector3.zero;
+            }
+
+            if (ready && Vector3.Distance(transform.position, playerTransform.position) < minDistance)
+            {
+                ready = false;
+                attackTimer = 0f;
                 // Optionally, you can stop moving or trigger an attack animation.
-                // Match the Zombie's position with the player's exact position.
-                transform.position = new Vector3(playerTransform.position.x, transform.position.y, transform.position.z);
+                animator.SetTrigger(AnimStrings.atkTrig);
             }
         }
     }
 
+    public void Knockback()
+    {
+        // Calculate the direction from the skeleton to the player.
+        Vector3 knockbackDirection = (transform.position - playerTransform.position).normalized;
 
+        // Calculate the knockback velocity.
+        Vector3 knockbackVelocity = knockbackDirection * knockbackForce;
+
+        // Apply the velocity to the Rigidbody.
+        rb.velocity = knockbackVelocity;
+    }
 }

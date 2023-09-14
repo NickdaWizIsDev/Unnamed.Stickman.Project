@@ -6,12 +6,26 @@ public class Damage : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Enemy"));
-        {   
-            Damageable damageable;
-            damageable = other.GetComponentInParent<Damageable>();
+        if (gameObject.CompareTag("Player"))
+        {
+            if (other.gameObject.CompareTag("Enemy"))
+            {
+                Damageable damageable;
+                damageable = other.GetComponentInParent<Damageable>();
 
-            damageable.Hit(damage);
+                damageable.Hit(damage);
+            }
+        }
+        
+        else if (gameObject.CompareTag("Enemy"))
+        {
+            if (other.gameObject.CompareTag("Player"))
+            {
+                Damageable damageable;
+                damageable = other.GetComponentInParent<Damageable>();
+
+                damageable.Hit(damage);
+            }
         }
     }
 }

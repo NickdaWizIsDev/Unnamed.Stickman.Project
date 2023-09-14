@@ -1,7 +1,9 @@
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UnityEngine.XR;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -31,29 +33,6 @@ public class PlayerMovement : MonoBehaviour
 
     public bool isGrounded;
 
-    private bool isFacingRight = true;
-    public bool IsFacingRight
-    {
-        get
-        {
-            return isFacingRight;
-        }
-        private set
-        {
-            if (isFacingRight != value)
-            {
-                // Calculate the new rotation based on facing direction
-                Vector3 newScale = transform.localScale ;
-                newScale.x *= -1f;
-
-                // Apply the new rotation to the character's transform
-                transform.localScale = newScale;
-            }
-
-            isFacingRight = value;
-        }
-    }
-
     private bool isMoving;
     public bool IsMoving
     {
@@ -76,16 +55,22 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public AudioClip walk1;
+    public AudioClip walk2;
+    public AudioClip land;
+
     [SerializeField] private Vector2 movement;
     [SerializeField] private Vector3 velocity;
 
     private CharacterController controller;
     private Animator anim;
+    private AudioSource audioSource;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        anim = GetComponent<Animator>();        
+        anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -108,9 +93,14 @@ public class PlayerMovement : MonoBehaviour
         anim.SetFloat(AnimStrings.yVel, velocity.y);
         anim.SetBool(AnimStrings.isGrounded, isGrounded);
 
-        Vector3 moveDirection = transform.right * movement;
+        Vector3 moveDirection = new (movement.x, 0f, movement.y); ;
         if(CanMove)
             controller.Move(moveSpeed * Time.deltaTime * moveDirection);
+
+        if (IsMoving)
+        {
+            SetFacingDirection(movement);
+        }
 
         // Apply gravity
         controller.Move(velocity * Time.deltaTime);
@@ -122,21 +112,19 @@ public class PlayerMovement : MonoBehaviour
         {
             movement = context.ReadValue<Vector2>();
             IsMoving = movement != Vector2.zero;
-
-            SetFacingDirection(movement);
         }
 
     }
     private void SetFacingDirection(Vector2 moveInput)
     {
-        if (moveInput.x > 0 && !IsFacingRight)
-        {
-            IsFacingRight = true;
-        }
-        else if (moveInput.x < 0 && IsFacingRight)
-        {
-            IsFacingRight = false;
-        }
+        // Calculate the angle in degrees between the current forward direction and the desired move direction.
+        float targetAngle = Mathf.Atan2(moveInput.x, moveInput.y) * Mathf.Rad2Deg - 90f;
+
+        // Create a target rotation based on the angle.
+        Quaternion targetRotation = Quaternion.Euler(0f, targetAngle, 0f);
+
+        // Smoothly interpolate between the current rotation and the target rotation.
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 30f * Time.deltaTime);
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -150,5 +138,20 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("Jump!");
             }
         }
+    }
+
+    public void PlayWalkOne()
+    {
+        audioSource.PlayOneShot(walk1, 0.45f);
+    }
+
+    public void PlayWalkTwo()
+    {
+        audioSource.PlayOneShot(walk2, 0.45f);
+    }
+
+    public void Land()
+    {
+        audioSource.PlayOneShot(land, 0.15f);
     }
 }
